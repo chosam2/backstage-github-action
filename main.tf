@@ -9,9 +9,8 @@ terraform {
 
 #   backend "remote" {}
 
-  backend "remote" {
+  cloud {
     organization = "hyungwook"
-
     workspaces {
       name = "ec2-workspace"
     }
