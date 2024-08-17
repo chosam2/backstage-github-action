@@ -63,55 +63,53 @@ jobs:
 
     - name: Set Terraform Cloud Variables
       run: |
-        echo $TFC_WORKSPACE;
+        curl -s --header "Authorization: Bearer $TF_API_TOKEN" \
+             --header "Content-Type: application/vnd.api+json" \
+             --request PATCH \
+             --data "{
+               \"data\": {
+                 \"type\":\"vars\",
+                 \"attributes\": {
+                   \"key\":\"instance_name\",
+                   \"value\":\"${{ github.event.inputs.instanceName }}\",
+                   \"category\":\"terraform\",
+                   \"hcl\":false
+                 }
+               }
+             }" \
+             "https://app.terraform.io/api/v2/workspaces/${TFC_WORKSPACE}/vars"
 
         curl -s --header "Authorization: Bearer $TF_API_TOKEN" \
              --header "Content-Type: application/vnd.api+json" \
              --request PATCH \
-             --data '{
-               "data": {
-                 "type":"vars",
-                 "attributes": {
-                   "key":"instance_name",
-                   "value":"${{ github.event.inputs.instanceName }}",
-                   "category":"terraform",
-                   "hcl":false
+             --data "{
+               \"data\": {
+                 \"type\":\"vars\",
+                 \"attributes\": {
+                   \"key\":\"aws_region\",
+                   \"value\":\"${{ github.event.inputs.awsRegion }}\",
+                   \"category\":\"terraform\",
+                   \"hcl\":false
                  }
                }
-             }' \
-             https://app.terraform.io/api/v2/workspaces/$TFC_WORKSPACE/vars
+             }" \
+             "https://app.terraform.io/api/v2/workspaces/${TFC_WORKSPACE}/vars"
 
         curl -s --header "Authorization: Bearer $TF_API_TOKEN" \
              --header "Content-Type: application/vnd.api+json" \
              --request PATCH \
-             --data '{
-               "data": {
-                 "type":"vars",
-                 "attributes": {
-                   "key":"aws_region",
-                   "value":"${{ github.event.inputs.awsRegion }}",
-                   "category":"terraform",
-                   "hcl":false
+             --data "{
+               \"data\": {
+                 \"type\":\"vars\",
+                 \"attributes\": {
+                   \"key\":\"instance_type\",
+                   \"value\":\"${{ github.event.inputs.instanceType }}\",
+                   \"category\":\"terraform\",
+                   \"hcl\":false
                  }
                }
-             }' \
-             https://app.terraform.io/api/v2/workspaces/$TFC_WORKSPACE/vars
-
-        curl -s --header "Authorization: Bearer $TF_API_TOKEN" \
-             --header "Content-Type: application/vnd.api+json" \
-             --request PATCH \
-             --data '{
-               "data": {
-                 "type":"vars",
-                 "attributes": {
-                   "key":"instance_type",
-                   "value":"${{ github.event.inputs.instanceType }}",
-                   "category":"terraform",
-                   "hcl":false
-                 }
-               }
-             }' \
-             https://app.terraform.io/api/v2/workspaces/$TFC_WORKSPACE/vars
+             }" \
+             "https://app.terraform.io/api/v2/workspaces/${TFC_WORKSPACE}/vars"
 
 
     - name: Terraform Init
