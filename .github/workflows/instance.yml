@@ -24,6 +24,10 @@ on:
   # TF_CLOUD_ORGANIZATION: "hyungwook"
   # TF_WORKSPACE: "ec2-workspace"
   # TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+env:
+  TF_VAR_instance_name: ${{ github.event.inputs.instanceName }}
+  TF_VAR_aws_region: ${{ github.event.inputs.awsRegion }}
+  TF_VAR_instance_type: ${{ github.event.inputs.instanceType }}
 
 jobs:
   apply_ec2:
@@ -60,7 +64,8 @@ jobs:
       working-directory: ${{ github.event.inputs.instanceName }}
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve -var="instance_name=${{ github.event.inputs.instanceName }}" -var="aws_region=${{ github.event.inputs.awsRegion }}" -var="instance_type=${{ github.event.inputs.instanceType }}"
+      # run: terraform apply -auto-approve -var="instance_name=${{ github.event.inputs.instanceName }}" -var="aws_region=${{ github.event.inputs.awsRegion }}" -var="instance_type=${{ github.event.inputs.instanceType }}"
+      run: terraform apply -auto-approve 
       working-directory: ${{ github.event.inputs.instanceName }}
 
   destroy_instance:
@@ -93,5 +98,6 @@ jobs:
       # working-directory: ${{ github.event.inputs.instanceName }}
 
     - name: Terraform Destroy
-      run: terraform destroy -auto-approve -var="instance_name=${{ github.event.inputs.instanceName }}" -var="aws_region=${{ github.event.inputs.awsRegion }}" -var="instance_type=${{ github.event.inputs.instanceType }}"
+      # run: terraform destroy -auto-approve -var="instance_name=${{ github.event.inputs.instanceName }}" -var="aws_region=${{ github.event.inputs.awsRegion }}" -var="instance_type=${{ github.event.inputs.instanceType }}"
+      run: terraform destroy -auto-approve 
       # working-directory: ${{ github.event.inputs.instanceName }}
