@@ -1,0 +1,102 @@
+name: Create an ec2 instance
+on:
+  workflow_dispatch:
+    inputs:
+      instanceName:
+        description: 'Name of the AWS Instance'
+        required: true
+      awsRegion:
+        description: 'AWS Region for the instance'
+        required: true
+      instanceType:
+        type: choice      
+        description: 'AWS instance type'
+        required: true
+        options: 
+        - t2.medium
+        - t2.small
+        - t2.micro
+        - t3.medium        
+      action:
+        description: 'Action to perform (apply/destroy)'
+        required: true
+
+jobs:
+  apply_ec2:
+    runs-on: self-hosted
+    
+    if: ${{ github.event.inputs.action == 'apply' }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2  
+      with:
+        path: ${{ github.event.inputs.instanceName }}     
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ github.event.inputs.awsRegion }}
+        
+    - name: make directory
+      run: mkdir -p ${{ github.event.inputs.instanceName }} > /dev/null 2>&1
+      
+    - name: Install Terraform state file
+      run: aws s3 cp s3://{S3_name}/${{ github.event.inputs.instanceName }}/ ./${{ github.event.inputs.instanceName }} --recursive
+      continue-on-error: true
+      
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ${{ github.event.inputs.instanceName }}
+      
+    - name: Terraform Format
+      run: terraform fmt
+      working-directory: ${{ github.event.inputs.instanceName }}
+      
+    - name: Terraform Validate
+      run: terraform validate
+      working-directory: ${{ github.event.inputs.instanceName }}
+      
+    - name: terraform apply
+      run: terraform apply -var instanceName=${{ github.event.inputs.instanceName }} -var awsRegion=${{ github.event.inputs.awsRegion }} -var instanceType=${{ github.event.inputs.instanceType }} -auto-approve
+      working-directory: ${{ github.event.inputs.instanceName }}   
+      
+    - name: Upload Terraform state file
+      run: aws s3 cp ./${{ github.event.inputs.instanceName }} s3://{S3_name}/${{ github.event.inputs.instanceName }} --recursive --exclude ".git*" --exclude ".terraform*"
+
+  destroy_instance:
+    runs-on: self-hosted
+    
+    if: ${{ github.event.inputs.action == 'destroy' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2 
+      with:
+        path: ${{ github.event.inputs.instanceName }}        
+      
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ github.event.inputs.awsRegion }}
+
+    - name: Install Terraform state file
+      run: aws s3 cp s3://wlsdn-s3/${{ github.event.inputs.instanceName }}/ ./${{ github.event.inputs.instanceName }} --recursive
+      
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ${{ github.event.inputs.instanceName }}
+      
+    - name: Terraform FMT
+      run: terraform fmt
+      working-directory: ${{ github.event.inputs.instanceName }}      
+      
+    - name: Terraform Destroy
+      run: terraform destroy -var instanceName=${{ github.event.inputs.instanceName }} -var awsRegion=${{ github.event.inputs.awsRegion }} -var instanceType=${{ github.event.inputs.instanceType }} -auto-approve
+      working-directory: ${{ github.event.inputs.instanceName }}
+
+    - name: Upload Terraform state file
+      run: aws s3 cp ./${{ github.event.inputs.instanceName }} s3://{S3_name}/${{ github.event.inputs.instanceName }} --recursive --exclude ".git*" --exclude ".terraform*"
