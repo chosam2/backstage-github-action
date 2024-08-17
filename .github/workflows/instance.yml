@@ -77,7 +77,7 @@ jobs:
                  }
                }
              }" \
-             "https://app.terraform.io/api/v2/workspaces/${TFC_WORKSPACE}/vars"
+             "https://app.terraform.io/api/v2/workspaces/ws-3R14S9g1aSFBKbXY/vars"
 
         curl -s --header "Authorization: Bearer $TF_API_TOKEN" \
              --header "Content-Type: application/vnd.api+json" \
@@ -93,7 +93,7 @@ jobs:
                  }
                }
              }" \
-             "https://app.terraform.io/api/v2/workspaces/${TFC_WORKSPACE}/vars"
+             "https://app.terraform.io/api/v2/workspaces/ws-3R14S9g1aSFBKbXY/vars"
 
         curl -s --header "Authorization: Bearer $TF_API_TOKEN" \
              --header "Content-Type: application/vnd.api+json" \
@@ -109,7 +109,7 @@ jobs:
                  }
                }
              }" \
-             "https://app.terraform.io/api/v2/workspaces/${TFC_WORKSPACE}/vars"
+             "https://app.terraform.io/api/v2/workspaces/ws-3R14S9g1aSFBKbXY/vars"
 
 
     - name: Terraform Init
