@@ -32,8 +32,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      # with:
-      #   path: ${{ github.event.inputs.instanceName }}
+      with:
+        path: ${{ github.event.inputs.instanceName }}
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
@@ -49,19 +49,19 @@ jobs:
 
     - name: Terraform Init
       run: terraform init
-      # working-directory: ${{ github.event.inputs.instanceName }}
+      working-directory: ${{ github.event.inputs.instanceName }}
 
     - name: Terraform Format
       run: terraform fmt -check
-      # working-directory: ${{ github.event.inputs.instanceName }}
+      working-directory: ${{ github.event.inputs.instanceName }}
 
     - name: Terraform Validate
       run: terraform validate
-      # working-directory: ${{ github.event.inputs.instanceName }}
+      working-directory: ${{ github.event.inputs.instanceName }}
 
     - name: Terraform Apply
       run: terraform apply -auto-approve -var="instance_name=${{ github.event.inputs.instanceName }}" -var="aws_region=${{ github.event.inputs.awsRegion }}" -var="instance_type=${{ github.event.inputs.instanceType }}"
-      # working-directory: ${{ github.event.inputs.instanceName }}
+      working-directory: ${{ github.event.inputs.instanceName }}
 
   destroy_instance:
     runs-on: self-hosted
