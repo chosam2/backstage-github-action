@@ -7,6 +7,8 @@ terraform {
     }
   }
 
+#   backend "remote" {}
+
   backend "remote" {
     organization = "hyungwook"
 
