@@ -51,6 +51,13 @@ jobs:
       with:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
+    - name: Debug Environment Variables
+      run: |
+        echo "TF_VAR_instance_name: $TF_VAR_instance_name"
+        echo "TF_VAR_aws_region: $TF_VAR_aws_region"
+        echo "TF_VAR_instance_type: $TF_VAR_instance_type"
+        terraform --version
+
     - name: Terraform Init
       run: terraform init
       working-directory: ${{ github.event.inputs.instanceName }}
