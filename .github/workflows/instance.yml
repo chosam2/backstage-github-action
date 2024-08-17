@@ -70,7 +70,19 @@ jobs:
       run: terraform validate
       working-directory: ${{ github.event.inputs.instanceName }}
 
+    - name: Terraform Plan
+      env:
+        TF_VAR_instance_name: ${{ github.event.inputs.instanceName }}
+        TF_VAR_aws_region: ${{ github.event.inputs.awsRegion }}
+        TF_VAR_instance_type: ${{ github.event.inputs.instanceType }}
+      run: terraform plan
+      working-directory: ${{ github.event.inputs.instanceName }}
+
     - name: Terraform Apply
+      env:
+        TF_VAR_instance_name: ${{ github.event.inputs.instanceName }}
+        TF_VAR_aws_region: ${{ github.event.inputs.awsRegion }}
+        TF_VAR_instance_type: ${{ github.event.inputs.instanceType }}
       # run: terraform apply -auto-approve -var="instance_name=${{ github.event.inputs.instanceName }}" -var="aws_region=${{ github.event.inputs.awsRegion }}" -var="instance_type=${{ github.event.inputs.instanceType }}"
       run: terraform apply -auto-approve 
       working-directory: ${{ github.event.inputs.instanceName }}
