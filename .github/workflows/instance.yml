@@ -63,6 +63,8 @@ jobs:
 
     - name: Set Terraform Cloud Variables
       run: |
+        echo $TFC_WORKSPACE;
+
         curl -s --header "Authorization: Bearer $TF_API_TOKEN" \
              --header "Content-Type: application/vnd.api+json" \
              --request PATCH \

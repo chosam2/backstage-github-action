@@ -10,7 +10,7 @@ terraform {
     organization = "hyungwook"
 
     workspaces {
-        name = "backstage-ec2"
+      name = "backstage-ec2"
     }
   }
 }
