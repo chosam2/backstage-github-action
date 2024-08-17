@@ -28,6 +28,9 @@ env:
   TF_VAR_instance_name: ${{ github.event.inputs.instanceName }}
   TF_VAR_aws_region: ${{ github.event.inputs.awsRegion }}
   TF_VAR_instance_type: ${{ github.event.inputs.instanceType }}
+  TF_CLOUD_ORGANIZATION: "hyungwook"
+  TF_WORKSPACE: "ec2-workspace"
+  TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
 
 jobs:
   apply_ec2:
@@ -51,12 +54,63 @@ jobs:
       with:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-    - name: Debug Environment Variables
+    # - name: Debug Environment Variables
+    #   run: |
+    #     echo "TF_VAR_instance_name: $TF_VAR_instance_name"
+    #     echo "TF_VAR_aws_region: $TF_VAR_aws_region"
+    #     echo "TF_VAR_instance_type: $TF_VAR_instance_type"
+    #     terraform --version
+
+    - name: Set Terraform Cloud Variables
       run: |
-        echo "TF_VAR_instance_name: $TF_VAR_instance_name"
-        echo "TF_VAR_aws_region: $TF_VAR_aws_region"
-        echo "TF_VAR_instance_type: $TF_VAR_instance_type"
-        terraform --version
+        curl -s --header "Authorization: Bearer $TF_API_TOKEN" \
+             --header "Content-Type: application/vnd.api+json" \
+             --request PATCH \
+             --data '{
+               "data": {
+                 "type":"vars",
+                 "attributes": {
+                   "key":"instance_name",
+                   "value":"${{ github.event.inputs.instanceName }}",
+                   "category":"terraform",
+                   "hcl":false
+                 }
+               }
+             }' \
+             https://app.terraform.io/api/v2/workspaces/$TF_WORKSPACE/vars
+
+        curl -s --header "Authorization: Bearer $TF_API_TOKEN" \
+             --header "Content-Type: application/vnd.api+json" \
+             --request PATCH \
+             --data '{
+               "data": {
+                 "type":"vars",
+                 "attributes": {
+                   "key":"aws_region",
+                   "value":"${{ github.event.inputs.awsRegion }}",
+                   "category":"terraform",
+                   "hcl":false
+                 }
+               }
+             }' \
+             https://app.terraform.io/api/v2/workspaces/$TF_WORKSPACE/vars
+
+        curl -s --header "Authorization: Bearer $TF_API_TOKEN" \
+             --header "Content-Type: application/vnd.api+json" \
+             --request PATCH \
+             --data '{
+               "data": {
+                 "type":"vars",
+                 "attributes": {
+                   "key":"instance_type",
+                   "value":"${{ github.event.inputs.instanceType }}",
+                   "category":"terraform",
+                   "hcl":false
+                 }
+               }
+             }' \
+             https://app.terraform.io/api/v2/workspaces/$TF_WORKSPACE/vars
+
 
     - name: Terraform Init
       run: terraform init
@@ -71,18 +125,10 @@ jobs:
       working-directory: ${{ github.event.inputs.instanceName }}
 
     - name: Terraform Plan
-      env:
-        TF_VAR_instance_name: ${{ github.event.inputs.instanceName }}
-        TF_VAR_aws_region: ${{ github.event.inputs.awsRegion }}
-        TF_VAR_instance_type: ${{ github.event.inputs.instanceType }}
       run: terraform plan
       working-directory: ${{ github.event.inputs.instanceName }}
 
     - name: Terraform Apply
-      env:
-        TF_VAR_instance_name: ${{ github.event.inputs.instanceName }}
-        TF_VAR_aws_region: ${{ github.event.inputs.awsRegion }}
-        TF_VAR_instance_type: ${{ github.event.inputs.instanceType }}
       # run: terraform apply -auto-approve -var="instance_name=${{ github.event.inputs.instanceName }}" -var="aws_region=${{ github.event.inputs.awsRegion }}" -var="instance_type=${{ github.event.inputs.instanceType }}"
       run: terraform apply -auto-approve 
       working-directory: ${{ github.event.inputs.instanceName }}
