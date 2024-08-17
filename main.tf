@@ -6,13 +6,11 @@ terraform {
       version = "~> 4.0"
     }
   }
-
-#   backend "remote" {}
-
-  cloud {
+  backend "remote" {
     organization = "hyungwook"
+
     workspaces {
-      name = "ec2-workspace"
+        name = "backstage-ec2"
     }
   }
 }
